@@ -1,10 +1,11 @@
 module Page exposing (Page(..))
 
+import Page.Top
 import Page.Write
 
 
 type Page
-    = Top
+    = Top Page.Top.Model
     | Write Page.Write.Model
     | NotFound
 

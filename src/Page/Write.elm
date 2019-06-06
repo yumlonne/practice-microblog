@@ -1,9 +1,8 @@
 module Page.Write exposing (Model, Msg, update, view)
 
 import Browser exposing (Document)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Element exposing (..)
+import Element.Input as Input
 
 
 
@@ -52,9 +51,33 @@ view : Model -> Document Msg
 view model =
     { title = "Write Page"
     , body =
-        [ div []
-            [ input [ onInput OnInputTitle ] []
-            , textarea [ onInput OnInputBody ] []
-            ]
+        [ layout [ explain Debug.todo ] <|
+            column []
+                [ Input.button []
+                    { onPress = Nothing
+                    , label =
+                        link []
+                            { label = text "←"
+                            , url = "/"
+                            }
+                    }
+                , Input.text [ centerX, centerY ]
+                    { label = Input.labelLeft [ centerY ] (text "タイトル")
+                    , onChange = OnInputTitle
+                    , placeholder = Nothing
+                    , text = model.title
+                    }
+                , Input.multiline []
+                    { label = Input.labelHidden "本文"
+                    , onChange = OnInputBody
+                    , placeholder = Just <| Input.placeholder [] (el [] <| text "本文")
+                    , spellcheck = True
+                    , text = model.body
+                    }
+                , Input.button []
+                    { onPress = Just Post
+                    , label = text "送信"
+                    }
+                ]
         ]
     }

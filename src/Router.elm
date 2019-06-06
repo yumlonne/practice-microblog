@@ -7,7 +7,10 @@ routing : String -> Page.Page
 routing url =
     case url of
         "/" ->
-            Page.Top
+            Page.Top {}
+
+        "/index.html" ->
+            Page.Top {}
 
         "/write" ->
             Page.Write { title = "", body = "" }

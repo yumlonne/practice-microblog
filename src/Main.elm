@@ -1,9 +1,12 @@
 module Main exposing (main)
 
+-- PROJECT MODULES
+
 import Browser exposing (Document)
 import Browser.Navigation as Nav
 import Html
 import Page
+import Page.Top
 import Page.Write
 import Router
 import Url
@@ -50,7 +53,8 @@ init flags url key =
 
 
 type Msg
-    = GotWritePageMsg Page.Write.Msg
+    = GotTopPageMsg Page.Top.Msg
+    | GotWritePageMsg Page.Write.Msg
     | UrlChanged Url.Url
     | LinkClicked Browser.UrlRequest
 
@@ -61,9 +65,17 @@ update msg model =
         ( UrlChanged url, _ ) ->
             ( { model | page = Router.routing url.path }, Cmd.none )
 
-        ( LinkClicked fixme, _ ) ->
-            -- FIXME
-            ( model, Cmd.none )
+        ( LinkClicked urlReq, _ ) ->
+            case urlReq of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
+
+                Browser.External href ->
+                    ( model, Nav.load href )
+
+        ( GotTopPageMsg subMsg, Page.Top subModel ) ->
+            Page.Top.update subMsg subModel
+                |> updateWith (Page.Top >> updateModel model) GotTopPageMsg model
 
         ( GotWritePageMsg writePageMsg, Page.Write writeModel ) ->
             Page.Write.update writePageMsg writeModel
@@ -100,6 +112,9 @@ updateModel model page =
 view : Model -> Document Msg
 view model =
     case model.page of
+        Page.Top subModel ->
+            viewPage Page.Top.view GotTopPageMsg subModel
+
         Page.Write writeModel ->
             viewPage Page.Write.view GotWritePageMsg writeModel
 
